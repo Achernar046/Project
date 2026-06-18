@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: waste-coin-backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT}
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DB=${MONGODB_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
+      - SEPOLIA_RPC_URL=${SEPOLIA_RPC_URL}
+      - OFFICER_PRIVATE_KEY=${OFFICER_PRIVATE_KEY}
+      - WASTE_COIN_CONTRACT_ADDRESS=${WASTE_COIN_CONTRACT_ADDRESS}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - ENABLE_WALLET_EXPORT=${ENABLE_WALLET_EXPORT:-false}
+      - WALLET_MIN_GAS_BALANCE_ETH=${WALLET_MIN_GAS_BALANCE_ETH:-0.0003}
+      - WALLET_GAS_TOP_UP_AMOUNT_ETH=${WALLET_GAS_TOP_UP_AMOUNT_ETH:-0.001}
+      - REDIS_URL=redis://redis:6379
+      - UPLOAD_MAX_SIZE_MB=${UPLOAD_MAX_SIZE_MB:-5}
+      - UPLOAD_DIR=public/uploads
+    volumes:
+      - uploads_data:/app/public/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - waste-coin-network
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    container_name: waste-coin-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - waste-coin-network
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: waste-coin-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - waste-coin-network
+
+networks:
+  waste-coin-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  uploads_data:

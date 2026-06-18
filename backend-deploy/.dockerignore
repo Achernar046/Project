@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.local
+.git
+.gitignore
+npm-debug.log
+*.md
+docs
+src
+coverage
+*.log
+.DS_Store
+Thumbs.db

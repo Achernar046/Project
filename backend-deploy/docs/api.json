@@ -1,0 +1,631 @@
+{
+  "name": "WasteCoin Backend API",
+  "baseUrl": "http://<host>:3000",
+  "authSchemes": {
+    "public": {
+      "type": "none"
+    },
+    "auth": {
+      "type": "bearer"
+    },
+    "officer": {
+      "type": "bearer",
+      "role": "officer"
+    }
+  },
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "auth": "public",
+      "response": {
+        "status": 200,
+        "json": {
+          "status": "ok",
+          "message": "WasteCoin Backend is running"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "auth": "public",
+      "request": {
+        "json": {
+          "user_id": "65001",
+          "name": "John Doe",
+          "email": "john@example.com",
+          "password": "123456",
+          "role": "user"
+        }
+      },
+      "response": {
+        "status": 201,
+        "json": {
+          "message": "User registered successfully",
+          "token": "<jwt>",
+          "user": {
+            "id": "<objectId>",
+            "userId": "65001",
+            "name": "John Doe",
+            "email": "john@example.com",
+            "role": "user",
+            "walletAddress": "0x..."
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "auth": "public",
+      "request": {
+        "json": {
+          "email": "john@example.com",
+          "password": "123456"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Login successful",
+          "token": "<jwt>",
+          "user": {
+            "id": "<objectId>",
+            "email": "john@example.com",
+            "role": "user",
+            "walletAddress": "0x..."
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/waste/submit",
+      "auth": "auth",
+      "request": {
+        "json": {
+          "waste_type": "plastic",
+          "weight_kg": 1.5,
+          "description": "bottles",
+          "image_url": "https://example.com/img.jpg"
+        }
+      },
+      "response": {
+        "status": 201,
+        "json": {
+          "message": "Waste submission created successfully",
+          "submission": {
+            "id": "<objectId>",
+            "user_id": "<objectId>",
+            "waste_type": "plastic",
+            "weight_kg": 1.5,
+            "description": "bottles",
+            "image_url": "https://example.com/img.jpg",
+            "status": "pending",
+            "created_at": "<date>",
+            "updated_at": "<date>"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/waste/my-submissions",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "user_id": "<objectId>",
+            "waste_type": "plastic",
+            "weight_kg": 1.5,
+            "status": "pending",
+            "created_at": "<date>",
+            "updated_at": "<date>"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/waste/pending",
+      "auth": "officer",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "user_id": "<objectId>",
+            "waste_type": "plastic",
+            "weight_kg": 1.5,
+            "status": "pending",
+            "user": {
+              "_id": "<objectId>",
+              "email": "john@example.com"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/waste/approve",
+      "auth": "officer",
+      "request": {
+        "json": {
+          "submission_id": "<objectId>",
+          "coin_amount": 25
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Submission approved and coins minted",
+          "txHash": "0x...",
+          "coin_amount": 25
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/officer/add-coins",
+      "auth": "officer",
+      "request": {
+        "json": {
+          "user_id": "<objectId>",
+          "amount": 100
+        }
+      },
+      "response": {
+        "status": 201,
+        "json": {
+          "message": "Coins added successfully",
+          "transaction": {
+            "id": "<objectId>",
+            "amount": 100,
+            "user": "john@example.com",
+            "walletAddress": "0x...",
+            "txHash": "0x..."
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/officer/transactions",
+      "auth": "officer",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "user_id": "<objectId>",
+            "type": "mint",
+            "amount": 100,
+            "to_address": "0x...",
+            "blockchain_tx_hash": "0x...",
+            "status": "confirmed",
+            "created_at": "<date>",
+            "user": {
+              "_id": "<objectId>",
+              "email": "john@example.com"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/officer/rewards/report",
+      "auth": "officer",
+      "response": {
+        "status": 200,
+        "json": {
+          "inventory": [
+            {
+              "_id": "<objectId>",
+              "name": "Reward A",
+              "coin_price": 10,
+              "stock": 5
+            }
+          ],
+          "history": [
+            {
+              "_id": "<objectId>",
+              "user_id": "<objectId>",
+              "user_name": "John Doe",
+              "reward_name": "Reward A",
+              "created_at": "<date>",
+              "status": "pending"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/wallet/balance",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": {
+          "walletAddress": "0x...",
+          "balance": "100.0",
+          "symbol": "WST"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/wallet/info",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": {
+          "userId": "65001",
+          "name": "John Doe",
+          "email": "john@example.com",
+          "role": "user",
+          "walletAddress": "0x..."
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/wallet/transfer",
+      "auth": "auth",
+      "request": {
+        "json": {
+          "to_address": "0xabc...",
+          "amount": 5
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Transfer successful",
+          "txHash": "0x..."
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/wallet/export",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": {
+          "address": "0x...",
+          "privateKey": "0x...",
+          "warning": "NEVER share your private key with anyone!"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/transactions/history",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "user_id": "<objectId>",
+            "type": "transfer",
+            "amount": 5,
+            "to_address": "0x...",
+            "blockchain_tx_hash": "0x...",
+            "status": "confirmed",
+            "created_at": "<date>"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/profile",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": {
+          "_id": "<objectId>",
+          "user_id": "65001",
+          "name": "John Doe",
+          "email": "john@example.com",
+          "role": "user",
+          "wallet_address": "0x...",
+          "created_at": "<date>",
+          "updated_at": "<date>",
+          "stats": {
+            "total_submissions": 3,
+            "approved_submissions": 2,
+            "total_coins_earned": 50
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/users/profile",
+      "auth": "auth",
+      "request": {
+        "json": {
+          "name": "John D",
+          "profile_image": "https://example.com/me.jpg",
+          "phone_number": "0812345678"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Profile updated successfully"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/users/change-password",
+      "auth": "auth",
+      "request": {
+        "json": {
+          "currentPassword": "123456",
+          "newPassword": "654321"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Password changed successfully"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/list",
+      "auth": "officer",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "user_id": "65001",
+            "name": "John Doe",
+            "email": "john@example.com",
+            "role": "user",
+            "wallet_address": "0x...",
+            "created_at": "<date>",
+            "updated_at": "<date>"
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/app/dashboard",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": {
+          "profile": {
+            "userId": "65001",
+            "name": "John Doe",
+            "email": "john@example.com",
+            "role": "user",
+            "walletAddress": "0x..."
+          },
+          "wallet": {
+            "address": "0x...",
+            "createdAt": "<date>"
+          },
+          "recentTransactions": [
+            {
+              "_id": "<objectId>",
+              "type": "mint",
+              "amount": 25
+            }
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/app/verify-identity",
+      "auth": "auth",
+      "request": {
+        "json": {
+          "password": "123456"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Identity verified successfully",
+          "verified": true
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/app/change-password",
+      "auth": "auth",
+      "request": {
+        "json": {
+          "old_password": "123456",
+          "new_password": "654321"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Password updated successfully"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/rewards/list",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "name": "Reward A",
+            "description": "...",
+            "image_url": "https://example.com/r.jpg",
+            "coin_price": 10,
+            "stock": 5,
+            "category": "test",
+            "created_at": "<date>",
+            "updated_at": "<date>"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/rewards/redeem",
+      "auth": "auth",
+      "request": {
+        "json": {
+          "reward_id": "<objectId>"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Redemption successful",
+          "redemption": {
+            "reward_name": "Reward A",
+            "txHash": "0x..."
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/rewards/history",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "user_id": "<objectId>",
+            "reward_id": "<objectId>",
+            "reward_name": "Reward A",
+            "coin_price": 10,
+            "status": "pending",
+            "blockchain_tx_hash": "0x...",
+            "created_at": "<date>",
+            "updated_at": "<date>"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/rewards/add",
+      "auth": "officer",
+      "request": {
+        "json": {
+          "name": "Reward A",
+          "description": "created by api test",
+          "image_url": "https://example.com/test.png",
+          "coin_price": 10,
+          "stock": 1,
+          "category": "test"
+        }
+      },
+      "response": {
+        "status": 201,
+        "json": {
+          "message": "Reward added successfully",
+          "reward": {
+            "id": "<objectId>",
+            "name": "Reward A",
+            "description": "created by api test",
+            "image_url": "https://example.com/test.png",
+            "coin_price": 10,
+            "stock": 1,
+            "category": "test",
+            "created_at": "<date>",
+            "updated_at": "<date>",
+            "_id": "<objectId>"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/rewards/update/:id",
+      "auth": "officer",
+      "request": {
+        "json": {
+          "stock": 2,
+          "coin_price": 15
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Reward updated successfully"
+        }
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/rewards/delete/:id",
+      "auth": "officer",
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Reward deleted successfully"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": [
+          {
+            "_id": "<objectId>",
+            "user_id": "<objectId>",
+            "title": "...",
+            "message": "...",
+            "type": "success",
+            "is_read": false,
+            "created_at": "<date>"
+          }
+        ]
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/notifications/read-all",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "All notifications marked as read"
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/notifications/:id/read",
+      "auth": "auth",
+      "response": {
+        "status": 200,
+        "json": {
+          "message": "Notification marked as read"
+        }
+      }
+    }
+  ]
+}

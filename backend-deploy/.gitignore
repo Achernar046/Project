@@ -1,0 +1,33 @@
+# Node modules
+node_modules/
+
+# Build artifacts
+dist/
+build/
+artifacts/
+typechain-types/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Editor-specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local AI tooling
+.claude/
