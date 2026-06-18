@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = 'http://27.254.145.211:3000';
+const DEFAULT_API_URL = 'http://localhost:5000';
 
 function normalizeBaseUrl(url: string): string {
     return url.replace(/\/+$/, '');

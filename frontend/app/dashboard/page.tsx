@@ -100,7 +100,8 @@ export default function Dashboard() {
             });
             const data = await response.json();
             if (response.ok) {
-                setRewards(Array.isArray(data) ? data : []);
+                // BUG-004 fix: API returns { success: true, data: [...], pagination: {...} }
+                setRewards(Array.isArray(data.data) ? data.data : []);
             }
         } catch (error) {
             console.error('Failed to fetch rewards:', error);

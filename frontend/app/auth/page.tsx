@@ -11,11 +11,11 @@ export default function AuthPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState<'user' | 'officer'>('user');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -27,7 +27,8 @@ export default function AuthPage() {
                 : buildApiUrl('/api/auth/register');
             const body = mode === 'login'
                 ? { email, password }
-                : { user_id: userId, name, email, password, role };
+                : { user_id: userId, name, email, password };
+            // Note: role is NOT sent — backend always assigns 'user' on registration (BUG-009 fix)
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -38,19 +39,20 @@ export default function AuthPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Authentication failed');
+                throw new Error(data.message || data.error || 'Authentication failed');
             }
 
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            // BUG-003 fix: Backend returns { success: true, data: { user, tokens: { accessToken, ... } } }
+            localStorage.setItem('token', data.data.tokens.accessToken);
+            localStorage.setItem('user', JSON.stringify(data.data.user));
 
-            if (data.user.role === 'officer') {
+            if (data.data.user.role === 'officer') {
                 router.push('/officer');
             } else {
                 router.push('/dashboard');
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
         }
@@ -193,7 +195,7 @@ export default function AuthPage() {
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                         placeholder="Password"
-                                        minLength={6}
+                                        minLength={8}
                                     />
                                     <button
                                         type="button"
@@ -209,18 +211,7 @@ export default function AuthPage() {
                                     </button>
                                 </div>
 
-                                {mode === 'register' && (
-                                    <div className={styles.inputGroup}>
-                                        <select
-                                            className={styles.input}
-                                            value={role}
-                                            onChange={(e) => setRole(e.target.value as 'user' | 'officer')}
-                                        >
-                                            <option value="user">User (Submit Waste)</option>
-                                            <option value="officer">Officer (Approve Submissions)</option>
-                                        </select>
-                                    </div>
-                                )}
+                                {/* Role selector removed: all new accounts are 'user' by default (BUG-009 security fix) */}
 
                                 {mode === 'login' && (
                                     <div className={styles.formOptions}>

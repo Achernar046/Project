@@ -2,17 +2,23 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
+    "moduleResolution": "node",
     "esModuleInterop": true,
+    "strict": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "resolveJsonModule": true,
+    "outDir": "./dist"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "hardhat.config.ts",
+    "hardhat.config.js",
+    "contracts/**/*",
+    "test/**/*",
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "frontend",
+    "backend-deploy"
+  ]
 }

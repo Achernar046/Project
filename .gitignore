@@ -50,3 +50,6 @@ scripts/test-api-integration.js
 scripts/test-blockchain-connection.js
 backend-deploy/
 projectW/
+
+# Claude / AI tools (contains API keys)
+.claude/
