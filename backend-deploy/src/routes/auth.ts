@@ -25,6 +25,10 @@ router.post('/register', asyncHandler(async (req: Request, res: Response) => {
         throw ApiError.badRequest('User ID, Name, Email and Password are required');
     }
 
+    if (!/^\d+$/.test(userId)) {
+        throw ApiError.badRequest('User ID must contain only numbers');
+    }
+
     // Password strength validation
     const passwordStrength = validatePasswordStrength(password);
     if (!passwordStrength.valid) {

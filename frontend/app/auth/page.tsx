@@ -158,9 +158,9 @@ export default function AuthPage() {
                                                 type="text"
                                                 className={styles.input}
                                                 value={userId}
-                                                onChange={(e) => setUserId(e.target.value)}
+                                                onChange={(e) => setUserId(e.target.value.replace(/\D/g, ''))}
                                                 required
-                                                placeholder="User ID (e.g., USER001)"
+                                                placeholder="User ID (Numbers only, e.g., 001)"
                                             />
                                         </div>
                                         <div className={styles.inputGroup}>
@@ -195,7 +195,7 @@ export default function AuthPage() {
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                         placeholder="Password"
-                                        minLength={8}
+                                        minLength={6}
                                     />
                                     <button
                                         type="button"

@@ -117,7 +117,7 @@ cp frontend/.env.example frontend/.env
 
 | Variable | ค่า (Dev) | ค่า (Production) |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:5000` | `https://api.yourdomain.com` |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:3000` | `https://api.yourdomain.com` |
 
 > **หมายเหตุ**: `NEXT_PUBLIC_*` ต้อง rebuild frontend เมื่อเปลี่ยนค่า
 
@@ -236,6 +236,7 @@ Services ที่จะรัน:
 |---|---|---|
 | `waste-coin-backend` | `3000` | Express API |
 | `waste-coin-frontend` | `3001` | Next.js Frontend |
+| `waste-coin-mongodb` | `27017` | Local MongoDB |
 | `waste-coin-redis` | *(internal)* | Redis (internal only) |
 
 ### 3. ตรวจสอบ
@@ -427,7 +428,7 @@ curl http://localhost:3000
 
 **แก้ไข:** ตรวจสอบ `frontend/.env`
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000  # ต้องตรงกับ backend PORT
+NEXT_PUBLIC_API_URL=http://localhost:3000  # ต้องตรงกับ backend PORT
 ```
 แล้ว restart frontend
 
@@ -498,10 +499,10 @@ npm run dev
 
 | Service | Port (Dev) | Port (Docker) |
 |---|---|---|
-| Frontend (Next.js) | `3000` | `3001` |
-| Backend (Express) | `5000` | `3000` |
+| Frontend (Next.js) | `3001` | `3001` |
+| Backend (Express) | `3000` | `3000` |
 | Redis | `6379` | *(internal)* |
-| MongoDB | Atlas (cloud) | Atlas (cloud) |
+| MongoDB | `27017` | `27017` |
 
 ---
 
@@ -509,7 +510,7 @@ npm run dev
 
 | Service | URL |
 |---|---|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:5000 |
-| Backend Health | http://localhost:5000/health |
-| Backend Ready | http://localhost:5000/ready |
+| Frontend | http://localhost:3001 |
+| Backend API | http://localhost:3000 |
+| Backend Health | http://localhost:3000/health |
+| Backend Ready | http://localhost:3000/ready |

@@ -123,6 +123,49 @@ if (!receipt) {
 
 ---
 
+---
+
+### BUG-010 — ระบบ Frontend คุยกับ Backend ผ่าน Docker ไม่ได้ (Failed to fetch)
+**สถานะ:** ✅ แก้แล้ว  
+**ไฟล์ที่เปลี่ยน:** `frontend/lib/api.ts` และ `frontend/Dockerfile`  
+**สาเหตุ:** `DEFAULT_API_URL` ชี้ไปที่ 5000 และ Next.js ใน Docker ไม่ได้ระบุ `HOSTNAME`  
+**หลังแก้:** เปลี่ยน `DEFAULT_API_URL` เป็น `http://localhost:3000` และเซ็ต `ENV HOSTNAME="0.0.0.0"` ใน Dockerfile พร้อมปรับ Healthcheck เป็น `127.0.0.1`
+
+---
+
+### BUG-011 — การรันผ่าน Docker Compose ไปพึ่งพา Cloud MongoDB
+**สถานะ:** ✅ แก้แล้ว  
+**ไฟล์ที่เปลี่ยน:** `backend-deploy/docker-compose.yml`  
+**ก่อนแก้:** ระบบใช้ MongoDB Atlas ซึ่งอาจทำให้ช้าหรือติดเรื่อง Network  
+**หลังแก้:** เพิ่ม Service `mongodb` ลงใน Docker Compose พร้อม `mongodb_data` volume และปรับให้ Backend เชื่อมต่อกับ `mongodb://mongodb:27017` ภายในระบบ Local
+
+---
+
+### BUG-012 — User ID กรอกเป็นตัวอักษรได้
+**สถานะ:** ✅ แก้แล้ว  
+**ไฟล์ที่เปลี่ยน:** `frontend/app/auth/page.tsx` และ `backend-deploy/src/routes/auth.ts`  
+**ก่อนแก้:** สามารถกรอกตัวอักษรได้  
+**หลังแก้:** 
+- Frontend เพิ่ม `replace(/\D/g, '')` ใน input เพื่อให้พิมพ์ได้เฉพาะตัวเลข
+- Backend เพิ่ม Regex Validation `/^\d+$/`
+
+---
+
+### BUG-013 — รหัสผ่านสร้างยากเกินไป (Weak Password Policy)
+**สถานะ:** ✅ แก้แล้ว  
+**ไฟล์ที่เปลี่ยน:** `backend-deploy/src/lib/auth.ts` และ `frontend/app/auth/page.tsx`  
+**ก่อนแก้:** บังคับให้ต้องมีพิมพ์ใหญ่, พิมพ์เล็ก, ตัวเลข, อักขระพิเศษ, ยาว 8 ตัวอักษร  
+**หลังแก้:** เอาเงื่อนไขที่ซับซ้อนออกทั้งหมด ให้ตรวจสอบแค่ความยาว `length >= 6`
+
+---
+
+### FEATURE-001 — สร้างบัญชี Officer (เจ้าหน้าที่) แบบ Manual
+**สถานะ:** ✅ เสร็จสมบูรณ์  
+**ไฟล์ที่เปลี่ยน:** `backend-deploy/scripts/create-officer.ts` (สร้างสคริปต์ใหม่)  
+**รายละเอียด:** เนื่องจากผู้ใช้ไม่สามารถสมัคร officer ผ่านเว็บได้ (ความปลอดภัย) จึงได้เขียนสคริปต์ `create-officer.ts` เพื่อเข้าแทรกบัญชีลง MongoDB โดยตรง (เช่น User ID: 999, Password: password123)
+
+---
+
 ## ⚠️ ยังไม่ได้แก้ (ต้องดำเนินการต่อ)
 
 ### BUG-008 — `blockchain.ts` เรียก `getConfig()` ที่ module level

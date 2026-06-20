@@ -72,7 +72,7 @@ Register:
 
 - **Node.js** `>= 18`
 - **Express**
-- **MongoDB** (native driver) — ใช้ MongoDB Atlas
+- **MongoDB** (native driver) — ใช้ MongoDB Local (ผ่าน Docker)
 - **Redis** (ioredis) — token revocation
 - **Auth**: JWT (`jsonwebtoken`) + bcrypt (`bcryptjs`)
 - **Web3**: `ethers v6`
@@ -127,10 +127,10 @@ Register:
 ### Backend (`backend-deploy/.env`)
 
 ```env
-PORT=5000
+PORT=3000
 NODE_ENV=development
 
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<dbname>
+MONGODB_URI=mongodb://localhost:27017/waste-coin-db
 MONGODB_DB=waste-coin-db
 
 JWT_SECRET=<64-char hex string>
@@ -151,7 +151,7 @@ UPLOAD_DIR=public/uploads
 ### Frontend (`frontend/.env`)
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 > **หมายเหตุ**: `NEXT_PUBLIC_*` ต้อง restart frontend เมื่อเปลี่ยนค่า
@@ -169,7 +169,7 @@ npm run generate-secrets
 
 - Node.js `>= 18`
 - Redis (รันอยู่ที่ `localhost:6379`)
-- MongoDB Atlas (หรือ local)
+- MongoDB (รันอยู่ที่ `localhost:27017` ผ่าน Docker)
 - RPC URL สำหรับ Sepolia (Alchemy/Infura)
 - Contract ถูก deploy แล้ว และมี `WASTE_COIN_CONTRACT_ADDRESS`
 
@@ -194,23 +194,23 @@ cd backend-deploy && npm install && cd ..
 ```bash
 cd backend-deploy
 npm run dev
-# → http://localhost:5000
+# → http://localhost:3000
 ```
 
 **Terminal 2 — Frontend:**
 ```bash
 cd frontend
 npm run dev
-# → http://localhost:3000
+# → http://localhost:3001
 ```
 
 ### Dev URLs
 
 | Service | URL |
 |---|---|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:5000 |
-| Health check | http://localhost:5000/health |
+| Frontend | http://localhost:3001 |
+| Backend API | http://localhost:3000 |
+| Health check | http://localhost:3000/health |
 
 ### Start Redis (ถ้ายังไม่ได้รัน)
 
@@ -229,7 +229,7 @@ docker run -d -p 6379:6379 redis:7-alpine
 
 ## API (Backend)
 
-Base URL (dev): `http://localhost:5000`
+Base URL (dev): `http://localhost:3000`
 
 ### Auth
 

@@ -12,8 +12,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=${PORT}
-      - MONGODB_URI=${MONGODB_URI}
-      - MONGODB_DB=${MONGODB_DB}
+      - MONGODB_URI=mongodb://mongodb:27017/${MONGODB_DB:-waste-coin-db}
+      - MONGODB_DB=${MONGODB_DB:-waste-coin-db}
       - JWT_SECRET=${JWT_SECRET}
       - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
       - SEPOLIA_RPC_URL=${SEPOLIA_RPC_URL}
@@ -39,6 +39,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
 
   redis:
     image: redis:7-alpine
@@ -52,6 +54,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - waste-coin-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: waste-coin-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - waste-coin-network
 
@@ -85,3 +103,4 @@ networks:
 volumes:
   redis_data:
   uploads_data:
+  mongodb_data:
